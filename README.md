@@ -1,6 +1,6 @@
 # Apollo GraphQL Subgraph Interface
 
-This is a test project to demonstrate that interfaces in
+This is a test project to demonstrate that interfaces' resolveType handler in
 graphql-js schemas are ignored.
 
 This project is an Express application that exposes an Apollo GraphQL
