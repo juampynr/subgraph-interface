@@ -1,7 +1,8 @@
 # Apollo GraphQL Subgraph Interface
 
 This is a test project to demonstrate that interfaces' resolveType handler in
-graphql-js schemas are ignored.
+graphql-js schemas are ignored. It is referenced by
+https://github.com/apollographql/federation/issues/3201.
 
 This project is an Express application that exposes an Apollo GraphQL
 subgraph using `graphql-js` to define the schema.
