@@ -6,7 +6,7 @@ https://github.com/apollographql/federation/issues/3201.
 
 There is a workaround at https://github.com/juampynr/subgraph-interface/pull/1.
 
-This project is an Express application that exposes an Apollo GraphQL
+The source code is an Express application that exposes an Apollo GraphQL
 subgraph using `graphql-js` to define the schema.
 
 The schema includes a `Character` interface and two types (`Hero` and `Villain`)
