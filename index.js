@@ -1,8 +1,9 @@
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
-const { buildSubgraphSchema } = require('@apollo/subgraph');
+const { buildSubgraphSchema, printSubgraphSchema } = require('@apollo/subgraph');
 const { GraphQLObjectType, GraphQLString, GraphQLInterfaceType, GraphQLSchema } = require('graphql');
 const { printSchema } = require('graphql/utilities');
+const { mapSchema, MapperKind } = require('@graphql-tools/utils');
 
 // Define the GraphQL interface
 const CharacterInterface = new GraphQLInterfaceType({
@@ -12,13 +13,7 @@ const CharacterInterface = new GraphQLInterfaceType({
     name: { type: GraphQLString },
   },
   resolveType: (value) => {
-    if (value.type === 'Hero') {
-      return HeroType;
-    }
-    if (value.type === 'Villain') {
-      return VillainType;
-    }
-    return null;
+    return value.type;
   },
 });
 
@@ -68,25 +63,37 @@ const QueryType = new GraphQLObjectType({
 });
 
 const schema = new GraphQLSchema({
-  types: [ CharacterInterface, HeroType, VillainType ],
+  types: [CharacterInterface, HeroType, VillainType],
   query: QueryType,
 });
 
 
 const typeDefs = gql(printSchema(schema));
 const resolvers = {
-  Query: queryFields,
+  Query: queryFields
 };
 
-const subgraph = buildSubgraphSchema([{ typeDefs, resolvers }]);
+const subgraph = buildSubgraphSchema({ typeDefs, resolvers });
+
+function addInterfaceResolversToSubgraph(subgraph, interfaces) {
+  return mapSchema(subgraph, {
+    [MapperKind.INTERFACE_TYPE]: (fieldConfig) => {
+      fieldConfig.resolveType = interfaces[fieldConfig.name].resolveType;
+      return fieldConfig;
+    },
+  });
+}
+
+const interfaces = {};
+interfaces[CharacterInterface.name] = CharacterInterface;
+const subgraphWithInterfaceResolvers = addInterfaceResolversToSubgraph(subgraph, interfaces);
 
 // Initialize the Express application
 const app = express();
 
 // Create the Apollo server
 const server = new ApolloServer({
-  schema: subgraph,
-
+  schema: subgraphWithInterfaceResolvers,
 });
 
 // Apply the Apollo GraphQL middleware to the Express application
